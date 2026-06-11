@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Claude Token Tracker",
+  "version": "1.4.0",
+  "description": "claude.ai-তে token count, cache timer, এবং session/weekly usage দেখায়।",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Claude Token Tracker",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://claude.ai/*"],
+      "css": ["src/styles.css"],
+      "js": [
+        "src/content/constants.js",
+        "src/content/bridge-client.js",
+        "src/content/tokens.js",
+        "src/content/ui.js",
+        "src/content/main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/injected/bridge.js"],
+      "matches": ["https://claude.ai/*"]
+    }
+  ]
+}

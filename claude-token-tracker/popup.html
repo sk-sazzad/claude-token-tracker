@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Token Tracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f12;
+    --bg2: #1a1a20;
+    --border: rgba(255,255,255,0.08);
+    --text: rgba(255,255,255,0.88);
+    --dim: rgba(255,255,255,0.42);
+    --blue: #4f8ef7;
+    --green: #34d399;
+    --radius: 10px;
+  }
+
+  body {
+    width: 300px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Hero header */
+  .hero {
+    padding: 16px 16px 14px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(79,142,247,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .logo {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #4f8ef7, #a78bfa);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(79,142,247,0.4);
+  }
+
+  .hero-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-sub {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 1px;
+  }
+
+  .badge {
+    margin-left: auto;
+    padding: 3px 8px;
+    background: rgba(52,211,153,0.15);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.04em;
+  }
+
+  /* Features grid */
+  .features {
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .feat {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: border-color 200ms;
+  }
+
+  .feat:hover { border-color: rgba(79,142,247,0.3); }
+
+  .feat-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .feat-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .feat-desc {
+    font-size: 10.5px;
+    color: var(--dim);
+    line-height: 1.4;
+  }
+
+  /* Bar preview */
+  .bar-preview {
+    margin: 0 14px;
+    padding: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .bar-track {
+    height: 5px;
+    background: rgba(128,128,128,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .bar-ctx {
+    width: 42%;
+    background: linear-gradient(90deg, #4f8ef7, #818cf8);
+    box-shadow: 0 0 8px rgba(79,142,247,0.4);
+  }
+
+  .bar-session {
+    width: 28%;
+    background: linear-gradient(90deg, #34d399, #4f8ef7);
+    box-shadow: 0 0 8px rgba(52,211,153,0.3);
+  }
+
+  .bar-weekly {
+    width: 15%;
+    background: linear-gradient(90deg, #f6ad55, #4f8ef7);
+  }
+
+  /* CTA */
+  .cta {
+    padding: 12px 14px 14px;
+  }
+
+  .open-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #4f8ef7, #818cf8);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 200ms, transform 150ms;
+    box-shadow: 0 4px 15px rgba(79,142,247,0.35);
+    letter-spacing: 0.01em;
+  }
+
+  .open-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .open-btn:active { transform: translateY(0); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 14px;
+  }
+
+  .note {
+    padding: 8px 14px 4px;
+    font-size: 10.5px;
+    color: var(--dim);
+    line-height: 1.5;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-top">
+    <div class="logo">⚡</div>
+    <div>
+      <div class="hero-title">Claude Token Tracker</div>
+      <div class="hero-sub">Real-time usage monitoring</div>
+    </div>
+    <div class="badge">LIVE</div>
+  </div>
+</div>
+
+<div class="features">
+  <div class="feat">
+    <div class="feat-icon">🔢</div>
+    <div class="feat-name">Token Count</div>
+    <div class="feat-desc">Context window usage, live updated</div>
+  </div>
+  <div class="feat">
+    <div class="feat-icon">⚡</div>
+    <div class="feat-name">Cache Timer</div>
+    <div class="feat-desc">Countdown until cache expires</div>
+  </div>
+  <div class="feat">
+    <div class="feat-icon">📊</div>
+    <div class="feat-name">5h Session</div>
+    <div class="feat-desc">Rate limit usage + reset time</div>
+  </div>
+  <div class="feat">
+    <div class="feat-icon">📅</div>
+    <div class="feat-name">7d Weekly</div>
+    <div class="feat-desc">Weekly quota with live bars</div>
+  </div>
+</div>
+
+<div class="bar-preview">
+  <div class="bar-label">
+    <span>Preview — live bars</span>
+    <span>animated</span>
+  </div>
+  <div style="font-size:10px; color: rgba(255,255,255,0.35); margin-bottom:4px;">Context window</div>
+  <div class="bar-track"><div class="bar-fill bar-ctx"></div></div>
+  <div style="font-size:10px; color: rgba(255,255,255,0.35); margin-bottom:4px;">5h session · 7d weekly</div>
+  <div class="bar-track"><div class="bar-fill bar-session"></div></div>
+  <div class="bar-track" style="margin-bottom:0"><div class="bar-fill bar-weekly"></div></div>
+</div>
+
+<div class="cta">
+  <button class="open-btn" id="openBtn">
+    Open claude.ai →
+  </button>
+</div>
+
+<script>
+  document.getElementById('openBtn').addEventListener('click', () => {
+    chrome.tabs.query({}, (tabs) => {
+      const claudeTab = tabs.find(t => t.url && t.url.startsWith('https://claude.ai'));
+      if (claudeTab) {
+        chrome.tabs.update(claudeTab.id, { active: true }, () => {
+          if (!chrome.runtime.lastError) chrome.windows.update(claudeTab.windowId, { focused: true });
+      });
+      } else {
+        chrome.tabs.create({ url: 'https://claude.ai' });
+      }
+    });
+  });
+</script>
+
+<div class="note">
+  Hover over bars for details · Click usage row to refresh
+</div>
+
+</body>
+</html>
